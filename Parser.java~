@@ -402,8 +402,14 @@ class Parser {
                 past_stmStates.push(stmState);
                 stmState = StatementState.CONDITION;
             }
-            past_exprs.push(current_expr);
-            current_expr = new BracketNode();
+            if (current_expr instanceof NotNode) {
+                BracketNode brNode = new BracketNode(current_expr);
+               ((NotNode) current_expr).kid = brNode;
+               current_expr = brNode;
+            } else {
+                past_exprs.push(current_expr);
+                current_expr = new BracketNode();
+            }
         }
     }
 
@@ -419,7 +425,11 @@ class Parser {
             }
         }
         // assert(current_expr instaceof BracketNode && current_expr.isFullRecv())
-        valNodes.push((ValNode) current_expr);
+        if (current_expr.getParent() instanceof NotNode) {
+            valNodes.push((ValNode) current_expr.getParent());
+        } else {
+            valNodes.push((ValNode) current_expr);
+        }
         if ( !(current_snode instanceof  IfNode) /*|| !(current_snode instanceof WhileNode)*/ || !past_exprs.empty())
             current_expr = past_exprs.pop();
     }
@@ -983,7 +993,8 @@ class Parser {
             // fall through
           case 23: break;
           case 8: 
-            { on_not();
+            { System.out.println("found " + yytext());
+    on_not();
             } 
             // fall through
           case 24: break;

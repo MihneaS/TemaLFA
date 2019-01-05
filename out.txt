@@ -1,0 +1,88 @@
+java Parser ../test/in/5.1.in
+found var a
+found var b
+found var t
+found endcmd ;
+
+found var a
+found aval 2
+found endcmd ;
+
+found var b
+found aval 3
+found endcmd ;
+
+found if
+found (
+found !
+found (
+found var a
+found >
+found var b
+found )
+found )
+found {
+
+found if
+found (
+found true
+found )
+found {
+
+found var t
+found aval 1
+found endcmd ;
+
+found }
+found {
+
+found var t
+found aval 0
+found endcmd ;
+
+found }
+
+found }
+found {
+
+found var t
+found aval 0
+found endcmd ;
+
+found }
+
+<MainNode>
+	<SequenceNode>
+		<AssigmentNode> =
+			<VariableNode> a
+			<IntNode> 2
+		<SequenceNode>
+			<AssigmentNode> =
+				<VariableNode> b
+				<IntNode> 3
+			<IfNode if>
+				<BracketNode> ()
+					<NotNode> !
+						<BracketNode> ()
+							<GreaterNode> >
+								<VariableNode> a
+								<VariableNode> b
+				<BlockNode> {}
+					<IfNode if>
+						<BracketNode> ()
+							<BoolNode> true
+						<BlockNode> {}
+							<AssigmentNode> =
+								<VariableNode> t
+								<IntNode> 1
+						<BlockNode> {}
+							<AssigmentNode> =
+								<VariableNode> t
+								<IntNode> 0
+				<BlockNode> {}
+					<AssigmentNode> =
+						<VariableNode> t
+						<IntNode> 0
+a=2
+b=3
+t=1

@@ -43,7 +43,7 @@ public class IfNode implements SNode{
         while(itabs-- > 0) {
             System.out.print("\t");
         }
-        System.out .println("<IfNode if>");
+        System.out .println("<IfNode> if");
         condition.print(tabs+1);
         then.print(tabs+1);
         otherwise.print(tabs+1);

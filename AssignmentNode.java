@@ -38,7 +38,7 @@ public class AssignmentNode implements SNode, Expr{
         while(itabs-- > 0) {
             System.out.print("\t");
         }
-        System.out .println("<AssigmentNode> =");
+        System.out .println("<AssignmentNode> =");
         var.print(tabs+1);
         val.print(tabs+1);
     }
