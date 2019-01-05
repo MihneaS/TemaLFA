@@ -14,7 +14,7 @@ import java.util.TreeMap;
 %init}
 
 %{
-   enum State {
+    enum State {
         NO_STATE, INITIALIZATION, ATRIBUTION
     }
 
@@ -109,6 +109,11 @@ import java.util.TreeMap;
                 current_expr = (Expr) grNode.getParent();
                 grNode.kid_right = node;
                 to_be_pushed = grNode;
+            } else if (current_expr instanceof AndNode) {
+                AndNode andNode = (AndNode) current_expr;
+                current_expr = (Expr) andNode.getParent();
+                andNode.kid_right = node;
+                to_be_pushed = andNode;
             }
             if (!(current_expr instanceof AssignmentNode ||
                     current_expr instanceof BracketNode)) {
@@ -157,6 +162,14 @@ import java.util.TreeMap;
         current_expr = nNode;
     }
 
+    void on_and() {
+        ValNode anode = valNodes.pop();
+        AndNode andNode = new AndNode(current_expr);
+        andNode.kid_left = anode;
+        current_expr.setNextNode((andNode));
+        current_expr = andNode;
+    }
+
     void on_bracket_open() {
         if (stmState == StatementState.IF_START) {
             past_stmStates.push(stmState);
@@ -173,8 +186,8 @@ import java.util.TreeMap;
             }
             if (current_expr instanceof NotNode) {
                 BracketNode brNode = new BracketNode(current_expr);
-               ((NotNode) current_expr).kid = brNode;
-               current_expr = brNode;
+                ((NotNode) current_expr).kid = brNode;
+                current_expr = brNode;
             } else {
                 past_exprs.push(current_expr);
                 current_expr = new BracketNode();
@@ -273,12 +286,14 @@ import java.util.TreeMap;
 
     void on_true() {
         BoolNode bNode = new BoolNode(true);
-        on_bnode(bNode);
+        //on_bnode(bNode);
+        on_anode(bNode);
     }
 
     void on_false() {
         BoolNode bNode = new BoolNode(false);
-        on_bnode(bNode);
+        //on_bnode(bNode);
+        on_anode(bNode);
     }
 
     void on_div() {
@@ -368,6 +383,11 @@ int {}
 "!" {
     System.out.println("found " + yytext());
     on_not();
+}
+
+"&&" {
+    System.out.println("found " + yytext());
+    on_and();
 }
 
 "(" {

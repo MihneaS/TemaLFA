@@ -19,10 +19,12 @@ public class ParserFake {
 
     TreeMap<String, Integer> var_to_value = new TreeMap<String, Integer>();
     Stack<ValNode> valNodes = new Stack<ValNode>();
+    Stack<ValNode> bValNodes = new Stack<ValNode>();
     MainNode root;
     SNode current_snode;
     Expr current_expr;
     Stack<Expr> past_exprs = new Stack<Expr>();
+    Stack<Expr> past_bexprs = new Stack<Expr>();
     State state = State.INITIALIZATION;
     StatementState stmState = StatementState.NO_STATE;
     Stack<StatementState> past_stmStates = new Stack<StatementState>();
@@ -104,6 +106,11 @@ public class ParserFake {
                 current_expr = (Expr) grNode.getParent();
                 grNode.kid_right = node;
                 to_be_pushed = grNode;
+            } else if (current_expr instanceof AndNode) {
+                AndNode andNode = (AndNode) current_expr;
+                current_expr = (Expr) andNode.getParent();
+                andNode.kid_right = node;
+                to_be_pushed = andNode;
             }
             if (!(current_expr instanceof AssignmentNode ||
                     current_expr instanceof BracketNode)) {
@@ -150,6 +157,14 @@ public class ParserFake {
         NotNode nNode = new NotNode(current_expr);
         current_expr.setNextNode(nNode);
         current_expr = nNode;
+    }
+
+    void on_and() {
+        ValNode anode = valNodes.pop();
+        AndNode andNode = new AndNode(current_expr);
+        andNode.kid_left = anode;
+        current_expr.setNextNode((andNode));
+        current_expr = andNode;
     }
 
     void on_bracket_open() {
@@ -268,12 +283,14 @@ public class ParserFake {
 
     void on_true() {
         BoolNode bNode = new BoolNode(true);
-        on_bnode(bNode);
+        //on_bnode(bNode);
+        on_anode(bNode);
     }
 
     void on_false() {
         BoolNode bNode = new BoolNode(false);
-        on_bnode(bNode);
+        //on_bnode(bNode);
+        on_anode(bNode);
     }
 
     void on_div() {
