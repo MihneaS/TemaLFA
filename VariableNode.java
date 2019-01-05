@@ -26,11 +26,6 @@ public class VariableNode implements ValNode{
         this.parent = parent;
     }
 
-    @Override
-    public boolean isFull() {
-        return true;
-    }
-
     public void setVal(Integer newVal) {
         var_to_val.put(name, newVal);
     }

@@ -18,11 +18,6 @@ public class SequenceNode implements SNode{
         this.parent = parent;
     }
 
-    @Override
-    public boolean isFull() {
-        return kid_left != null && kid_right != null;
-    }
-
     private void setKidLeft(SNode node) {
         kid_left = node;
     }

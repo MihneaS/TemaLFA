@@ -12,11 +12,6 @@ public class MainNode implements SNode{
     }
 
     @Override
-    public boolean isFull() {
-        return true;
-    }
-
-    @Override
     public void eval() {
         kid.eval();
     }

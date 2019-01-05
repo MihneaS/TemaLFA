@@ -27,11 +27,6 @@ public class BoolNode implements ValNode{
     }
 
     @Override
-    public boolean isFull() {
-        return true;
-    }
-
-    @Override
     public void print(int tabs) {
         int itabs = tabs;
         while(itabs-- > 0) {

@@ -46,11 +46,6 @@ public class GreaterNode implements ValNode, Expr{
     }
 
     @Override
-    public boolean isFull() {
-        return false;
-    }
-
-    @Override
     public void print(int tabs) {
         int itabs = tabs;
         while(itabs-- > 0) {

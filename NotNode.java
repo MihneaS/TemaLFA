@@ -3,6 +3,10 @@ public class NotNode implements ValNode, Expr{
     Node parent;
     ValNode kid;
 
+    public NotNode(Node parent) {
+        this.parent = parent;
+    }
+
     @Override
     public void setNextNode(ValNode node) {
         kid = node;
@@ -38,7 +42,7 @@ public class NotNode implements ValNode, Expr{
         while(itabs-- > 0) {
             System.out.print("\t");
         }
-        System.out.println("<PlusNode> +");
+        System.out.println("<NotNode> !");
         kid.print(tabs+1);
     }
 }

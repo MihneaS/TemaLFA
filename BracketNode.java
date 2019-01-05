@@ -30,11 +30,6 @@ public class BracketNode implements ValNode, Expr{
     }
 
     @Override
-    public boolean isFull() {
-        return kid != null;
-    }
-
-    @Override
     public void print(int tabs) {
         int itabs = tabs;
         while(itabs-- > 0) {

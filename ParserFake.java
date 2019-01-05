@@ -146,6 +146,12 @@ public class ParserFake {
         current_expr = grNode;
     }
 
+    void on_not() {
+        NotNode nNode = new NotNode(current_expr);
+        current_expr.setNextNode(nNode);
+        current_expr = nNode;
+    }
+
     void on_bracket_open() {
         if (stmState == StatementState.IF_START) {
             past_stmStates.push(stmState);

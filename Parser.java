@@ -35,11 +35,12 @@ class Parser {
    * Translates characters to character classes
    */
   private static final String ZZ_CMAP_PACKED = 
-    "\12\0\1\26\1\26\1\26\1\26\32\0\1\21\1\22\1\0\1\16"+
-    "\3\0\1\17\1\2\11\1\1\0\1\15\2\0\1\20\7\0\1\0"+
-    "\15\0\1\0\14\0\1\12\3\3\1\7\1\25\1\3\1\3\1\4"+
-    "\2\3\1\13\1\3\1\5\3\3\1\10\1\14\1\6\1\11\5\3"+
-    "\1\23\1\0\1\24\7\0\1\26\u1fa2\0\1\26\1\26\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\udfe6\0";
+    "\12\0\1\27\1\27\1\27\1\27\23\0\1\21\6\0\1\22\1\23"+
+    "\1\0\1\16\3\0\1\17\1\2\11\1\1\0\1\15\2\0\1\20"+
+    "\7\0\1\0\15\0\1\0\14\0\1\12\3\3\1\7\1\26\1\3"+
+    "\1\3\1\4\2\3\1\13\1\3\1\5\3\3\1\10\1\14\1\6"+
+    "\1\11\5\3\1\24\1\0\1\25\7\0\1\27\u1fa2\0\1\27\1\27"+
+    "\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\udfe6\0";
 
   /** 
    * Translates characters to character classes
@@ -53,11 +54,11 @@ class Parser {
 
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\2\2\4\3\1\4\1\5\1\6\1\7"+
-    "\1\10\1\11\1\12\1\13\1\3\1\14\1\3\1\15"+
-    "\3\3\1\1\3\3\1\16\1\3\1\17";
+    "\1\10\1\11\1\12\1\13\1\14\1\3\1\15\1\3"+
+    "\1\16\3\3\1\1\3\3\1\17\1\3\1\20";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[30];
+    int [] result = new int[31];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -82,13 +83,13 @@ class Parser {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\27\0\56\0\27\0\105\0\134\0\163\0\212"+
-    "\0\27\0\27\0\27\0\27\0\27\0\27\0\27\0\27"+
-    "\0\241\0\27\0\270\0\105\0\317\0\346\0\375\0\105"+
-    "\0\u0114\0\u012b\0\u0142\0\105\0\u0159\0\105";
+    "\0\0\0\30\0\60\0\30\0\110\0\140\0\170\0\220"+
+    "\0\30\0\30\0\30\0\30\0\30\0\30\0\30\0\30"+
+    "\0\30\0\250\0\30\0\300\0\110\0\330\0\360\0\u0108"+
+    "\0\110\0\u0120\0\u0138\0\u0150\0\110\0\u0168\0\110";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[30];
+    int [] result = new int[31];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -113,19 +114,20 @@ class Parser {
   private static final String ZZ_TRANS_PACKED_0 =
     "\1\2\1\3\1\4\1\5\1\6\1\5\1\7\1\10"+
     "\5\5\1\11\1\12\1\13\1\14\1\15\1\16\1\17"+
-    "\1\20\1\21\1\22\30\0\2\3\27\0\12\5\10\0"+
-    "\1\5\4\0\2\5\1\23\7\5\10\0\1\24\4\0"+
-    "\5\5\1\25\4\5\10\0\1\5\4\0\10\5\1\26"+
-    "\1\5\10\0\1\5\4\0\7\5\1\27\2\5\10\0"+
-    "\1\5\4\0\3\5\1\30\6\5\10\0\1\5\4\0"+
-    "\6\5\1\31\3\5\10\0\1\5\4\0\11\5\1\32"+
-    "\10\0\1\5\4\0\10\5\1\33\1\5\10\0\1\5"+
-    "\4\0\4\5\1\34\5\5\10\0\1\5\4\0\4\5"+
-    "\1\30\5\5\10\0\1\5\4\0\11\5\1\35\10\0"+
-    "\1\5\4\0\4\5\1\36\5\5\10\0\1\5\1\0";
+    "\1\20\1\21\1\22\1\23\31\0\2\3\30\0\12\5"+
+    "\11\0\1\5\4\0\2\5\1\24\7\5\11\0\1\25"+
+    "\4\0\5\5\1\26\4\5\11\0\1\5\4\0\10\5"+
+    "\1\27\1\5\11\0\1\5\4\0\7\5\1\30\2\5"+
+    "\11\0\1\5\4\0\3\5\1\31\6\5\11\0\1\5"+
+    "\4\0\6\5\1\32\3\5\11\0\1\5\4\0\11\5"+
+    "\1\33\11\0\1\5\4\0\10\5\1\34\1\5\11\0"+
+    "\1\5\4\0\4\5\1\35\5\5\11\0\1\5\4\0"+
+    "\4\5\1\31\5\5\11\0\1\5\4\0\11\5\1\36"+
+    "\11\0\1\5\4\0\4\5\1\37\5\5\11\0\1\5"+
+    "\1\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[368];
+    int [] result = new int[384];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -163,11 +165,11 @@ class Parser {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\1\1\1\11\4\1\10\11\1\1\1\11"+
+    "\1\0\1\11\1\1\1\11\4\1\11\11\1\1\1\11"+
     "\14\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[30];
+    int [] result = new int[31];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -380,6 +382,12 @@ class Parser {
         current_expr = grNode;
     }
 
+    void on_not() {
+        NotNode nNode = new NotNode(current_expr);
+        current_expr.setNextNode(nNode);
+        current_expr = nNode;
+    }
+
     void on_bracket_open() {
         if (stmState == StatementState.IF_START) {
             past_stmStates.push(stmState);
@@ -573,7 +581,7 @@ class Parser {
     char [] map = new char[0x110000];
     int i = 0;  /* index in packed string  */
     int j = 0;  /* index in unpacked array */
-    while (i < 130) {
+    while (i < 134) {
       int  count = packed.charAt(i++);
       char value = packed.charAt(i++);
       do map[j++] = value; while (--count > 0);
@@ -937,90 +945,95 @@ class Parser {
             { 
             } 
             // fall through
-          case 16: break;
+          case 17: break;
           case 2: 
             { System.out.println("found aval " + yytext());
     on_new_int(yytext());
             } 
             // fall through
-          case 17: break;
+          case 18: break;
           case 3: 
             { System.out.println("found var " + yytext());
     on_new_var(yytext());
             } 
             // fall through
-          case 18: break;
+          case 19: break;
           case 4: 
             { System.out.println("found endcmd " + yytext());
     on_end_cmd(yytext());
             } 
             // fall through
-          case 19: break;
+          case 20: break;
           case 5: 
             { System.out.println("found " + yytext());
     on_plus();
             } 
             // fall through
-          case 20: break;
+          case 21: break;
           case 6: 
             { System.out.println("found " + yytext());
     on_div();
             } 
             // fall through
-          case 21: break;
+          case 22: break;
           case 7: 
             { System.out.println("found " + yytext());
     on_greater();
             } 
             // fall through
-          case 22: break;
+          case 23: break;
           case 8: 
+            { on_not();
+            } 
+            // fall through
+          case 24: break;
+          case 9: 
             { System.out.println("found " + yytext());
     on_bracket_open();
             } 
             // fall through
-          case 23: break;
-          case 9: 
+          case 25: break;
+          case 10: 
             { System.out.println("found " + yytext());
     on_bracket_close();
             } 
             // fall through
-          case 24: break;
-          case 10: 
+          case 26: break;
+          case 11: 
             { System.out.println("found " + yytext());
     on_block_open();
             } 
             // fall through
-          case 25: break;
-          case 11: 
+          case 27: break;
+          case 12: 
             { System.out.println("found " + yytext());
     on_block_close();
             } 
             // fall through
-          case 26: break;
-          case 12: 
+          case 28: break;
+          case 13: 
             { System.out.print(yytext());
             } 
             // fall through
-          case 27: break;
-          case 13: 
+          case 29: break;
+          case 14: 
             { System.out.println("found " + yytext());
     on_if();
             } 
             // fall through
-          case 28: break;
-          case 14: 
+          case 30: break;
+          case 15: 
             { System.out.println("found " + yytext());
     on_true();
             } 
             // fall through
-          case 29: break;
-          case 15: 
+          case 31: break;
+          case 16: 
             { System.out.println("found " + yytext());
     on_false();
             } 
             // fall through
-          case 30: break;
+          case 32: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

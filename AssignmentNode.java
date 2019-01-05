@@ -19,11 +19,6 @@ public class AssignmentNode implements SNode, Expr{
         this.parent = parent;
     }
 
-    @Override
-    public boolean isFull() {
-        return val != null;
-    }
-
     void setVal(ValNode node) {
         val = node;
     }

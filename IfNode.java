@@ -38,11 +38,6 @@ public class IfNode implements SNode{
     }
 
     @Override
-    public boolean isFull() {
-        return condition != null && then != null && otherwise != null;
-    }
-
-    @Override
     public void print(int tabs) {
         int itabs = tabs;
         while(itabs-- > 0) {
