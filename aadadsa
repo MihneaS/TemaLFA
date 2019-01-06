@@ -1,0 +1,10 @@
+        if (stmState == StatementState.CONDITION) {
+            stmState = past_stmStates.pop();
+            ValNode valNode = avalNodes.pop();
+            if (stmState == StatementState.IF_START) {
+                stmState = StatementState.IF_T;
+                ((BracketNode)((IfNode)current_snode).condition).kid = valNode;
+            } else if (stmState == StatementState.WHILE_START) {
+                // TODO;
+            }
+        }

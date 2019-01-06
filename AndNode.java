@@ -3,10 +3,14 @@ public class AndNode implements ValNode, Expr, TwoOperands {
     Node parent;
     ValNode kid_left;
     ValNode kid_right;
-    int priority;
+    int priority = 5;
 
     public AndNode(Node parent) {
         this.parent = parent;
+    }
+
+    public AndNode() {
+
     }
 
     @Override
@@ -86,4 +90,5 @@ public class AndNode implements ValNode, Expr, TwoOperands {
     public void setRightNode(ValNode node) {
         kid_right = node;
     }
+
 }

@@ -1,17 +1,17 @@
-import java.util.TreeMap;
+import java.util.Map;
 
 public class VariableNode implements ValNode{
 
-    public TreeMap<String, Integer> var_to_val;
+    public Map<String, Integer> var_to_val;
     public String name;
     public Node parent;
 
-    public VariableNode(TreeMap<String, Integer> var_to_val, String name) {
+    public VariableNode(Map<String, Integer> var_to_val, String name) {
         this.var_to_val = var_to_val;
         this.name = name;
     }
 
-    public VariableNode(TreeMap<String, Integer> var_to_val, Node parent, String name) {
+    public VariableNode(Map<String, Integer> var_to_val, Node parent, String name) {
         this(var_to_val, name);
         this.parent = parent;
     }

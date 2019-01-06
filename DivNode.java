@@ -3,7 +3,7 @@ public class DivNode implements ValNode, Expr, TwoOperands {
     Node parent;
     ValNode kid_left;
     ValNode kid_right;
-    int priority;
+    int priority = 8;
 
     DivNode() {}
 

@@ -1,6 +1,6 @@
 import java.util.Map;
 import java.util.Stack;
-import java.util.TreeMap;
+import java.util.HashMap;
 
 public class ParserFake {
     ParserFake() {
@@ -17,16 +17,42 @@ public class ParserFake {
         NO_STATE, IF_START, IF_C, IF_T, IF_O, WHILE_START, WHILE_C, WHILE_B, CONDITION
     }
 
-    TreeMap<String, Integer> var_to_value = new TreeMap<String, Integer>();
-    Stack<ValNode> avalNodes = new Stack<ValNode>();
-    Stack<ValNode> bValNodes = new Stack<ValNode>();
+    HashMap<String, Integer> var_to_value = new HashMap<String, Integer>();
+    Stack<ValNode> aValNodes = new Stack<ValNode>();
+    Stack<ValNode> bValNodes = aValNodes;//new Stack<ValNode>();
     MainNode root;
     SNode current_snode;
-    Stack<Expr> aexprs = new Stack<Expr>();
-    Stack<Expr> bexprs = new Stack<Expr>();
+    Stack<Expr> exprs = new Stack<Expr>();
+    Stack<Expr> root_exprs = new Stack<Expr>();
+    Stack<Stack<Expr>> past_exprs = new Stack<>();
     State state = State.INITIALIZATION;
     StatementState stmState = StatementState.NO_STATE;
     Stack<StatementState> past_stmStates = new Stack<StatementState>();
+
+    void new_expr_env(Expr root) {
+        past_exprs.push(exprs);
+        root_exprs.push(root);
+        exprs = new Stack<>();
+    }
+
+    void restore_expr_env() {
+        exprs = past_exprs.pop();
+        root_exprs.pop();
+    }
+
+    void clear_expr_env() {
+        past_exprs.clear();
+        root_exprs.clear();
+        exprs = new Stack<>();
+    }
+
+    Expr get_last_expr() {
+        if (!exprs.empty()) {
+            return exprs.pop();
+        } else {
+            return root_exprs.peek();
+        }
+    }
 
     void init_var(String new_var) {
         var_to_value.put(new_var, null);
@@ -41,90 +67,68 @@ public class ParserFake {
         } else {
             VariableNode varNode = new VariableNode(var_to_value, new_var);
             if (state == State.NO_STATE && stmState == StatementState.NO_STATE) {
-                AssignmentNode assNode = new AssignmentNode(current_snode, varNode);
-                varNode.setParent(assNode);
-                current_expr = assNode;
-                current_snode.setNextSNode(assNode);
-                state = State.ATRIBUTION;
+                on_assignment(varNode);
             } else {
                 on_anode(varNode);
             }
         }
     }
 
+    void on_assignment(VariableNode var) {
+        AssignmentNode assNode = new AssignmentNode(current_snode, var);
+        var.setParent(assNode);
+        new_expr_env(assNode);
+        current_snode.setNextSNode(assNode);
+        state = State.ATRIBUTION;
+    }
+
+    void on_end_cmd(String str) {
+        if (state == State.ATRIBUTION) {
+            ValNode anode = aValNodes.pop();
+            Expr expr = get_last_expr();
+            expr.setNextNode(anode);
+            anode.setParent(expr);
+            SNode new_seq = new SequenceNode(current_snode);
+            current_snode.setNextSNode(new_seq);
+            current_snode = new_seq;
+            clear_expr_env();
+        }
+        state = State.NO_STATE;
+    }
+
     void on_bnode(ValNode node) {
-        ValNode to_be_pushed = null;
-        if (current_expr instanceof BracketNode) {
-            to_be_pushed = node;
-        } else {
-            /*if (current_expr instanceof PlusNode) {
-                PlusNode pNode = (PlusNode) current_expr;
-                current_expr = (Expr) pNode.getParent();
-                pNode.kid_right = node;
-                to_be_pushed = pNode;
-            } else if (current_expr instanceof DivNode) {
-                DivNode dNode = (DivNode) current_expr;
-                current_expr = (Expr) dNode.getParent();
-                dNode.kid_right = node;
-                to_be_pushed = dNode;
-            }
-            if (!(current_expr instanceof AssignmentNode ||
-                    current_expr instanceof BracketNode)) {
-                do {
-                    current_expr = (Expr) current_expr.getParent();
-                } while (!(current_expr instanceof AssignmentNode ||
-                        current_expr instanceof BracketNode));
-                to_be_pushed = current_expr.getLastANode();
-            }*/
-        }
-        if (to_be_pushed == null) {
-            System.err.println("error in on_bnode: to_be_pushed is null");
-            System.exit(1);
-        }
-        valNodes.push(to_be_pushed);
+        on_valNode(node, bValNodes);
     }
 
     void on_anode(ValNode node) {
+        on_valNode(node, aValNodes);
+    }
+
+    void on_valNode(ValNode node, Stack<ValNode> dest) {
         ValNode to_be_pushed = null;
-        if (current_expr instanceof AssignmentNode ||
-                current_expr instanceof BracketNode) {
+        if (exprs.empty() || exprs.peek() instanceof OneOperand) {
             to_be_pushed = node;
         } else {
-            if (current_expr instanceof PlusNode) {
-                PlusNode pNode = (PlusNode) current_expr;
-                current_expr = (Expr) pNode.getParent();
-                pNode.kid_right = node;
-                to_be_pushed = pNode;
-            } else if (current_expr instanceof DivNode) {
-                DivNode dNode = (DivNode) current_expr;
-                current_expr = (Expr) dNode.getParent();
-                dNode.kid_right = node;
-                to_be_pushed = dNode;
-            } else if (current_expr instanceof GreaterNode) {
-                GreaterNode grNode = (GreaterNode) current_expr;
-                current_expr = (Expr) grNode.getParent();
-                grNode.kid_right = node;
-                to_be_pushed = grNode;
-            } else if (current_expr instanceof AndNode) {
-                AndNode andNode = (AndNode) current_expr;
-                current_expr = (Expr) andNode.getParent();
-                andNode.kid_right = node;
-                to_be_pushed = andNode;
+            Expr expr = exprs.pop();
+            if (expr instanceof TwoOperands) {
+                TwoOperands texpr = (TwoOperands) expr;
+                expr = (Expr) texpr.getParent();
+                texpr.setRightNode(node);
+                to_be_pushed = (ValNode) texpr;
             }
-            if (!(current_expr instanceof AssignmentNode ||
-                    current_expr instanceof BracketNode)) {
+            if (!( expr instanceof OneOperand)) {
                 do {
-                    current_expr = (Expr) current_expr.getParent();
-                } while (!(current_expr instanceof AssignmentNode ||
-                        current_expr instanceof BracketNode));
-                to_be_pushed = current_expr.getLastNode();
+                    expr = (Expr) get_last_expr();
+                } while (!(expr instanceof OneOperand));
+                to_be_pushed = expr.getLastNode();
+                exprs.push(expr);
             }
         }
         if (to_be_pushed == null) {
             System.err.println("error in on_anode: to_be_pushed is null");
             System.exit(1);
         }
-        valNodes.push(to_be_pushed);
+        dest.push(to_be_pushed);
     }
 
     void on_if() {
@@ -135,35 +139,55 @@ public class ParserFake {
         stmState = StatementState.IF_START;
     }
 
+    void on_two_op(TwoOperands op, ValNode lastVal) {
+        Expr expr = get_last_expr();
+        op.setParent(expr);
+        if (lastVal instanceof TwoOperands &&
+                op.getPriority() > ((TwoOperands) lastVal).getPriority()) {
+            op.setLeftNode(((TwoOperands) lastVal).getRightNode());
+            ((TwoOperands) lastVal).setRightNode((ValNode) op);
+            lastVal.setParent(expr);
+            op.setParent(lastVal);
+            expr.setNextNode(lastVal);
+            exprs.push(op);
+        } else {
+            op.setNextNode(lastVal);
+            lastVal.setParent(op);
+            expr.setNextNode((ValNode) op);
+            exprs.push(op);
+        }
+    }
+
     void on_plus() {
-        ValNode anode = valNodes.pop();
-        PlusNode pNode = new PlusNode(current_expr);
-        pNode.kid_left = anode;
-        anode.setParent(pNode);
-        current_expr.setNextNode(pNode);
-        current_expr = pNode;
+        ValNode aNode = aValNodes.pop();
+        PlusNode pNode = new PlusNode();
+        on_two_op(pNode, aNode);
+    }
+
+    void on_div() {
+        ValNode aNode = aValNodes.pop();
+        DivNode dNode = new DivNode();
+        on_two_op(dNode, aNode);
     }
 
     void on_greater() {
-        ValNode anode = valNodes.pop();
-        GreaterNode grNode = new GreaterNode(current_expr);
-        grNode.kid_left = anode;
-        current_expr.setNextNode((grNode));
-        current_expr = grNode;
+        ValNode aNode = aValNodes.pop();
+        GreaterNode grNode = new GreaterNode();
+        on_two_op(grNode, aNode);
     }
 
     void on_not() {
-        NotNode nNode = new NotNode(current_expr);
-        current_expr.setNextNode(nNode);
-        current_expr = nNode;
+        Expr expr = get_last_expr();
+        NotNode nNode = new NotNode(expr);
+        expr.setNextNode(nNode);
+        exprs.push(expr);
+        new_expr_env(nNode);
     }
 
     void on_and() {
-        ValNode anode = valNodes.pop();
-        AndNode andNode = new AndNode(current_expr);
-        andNode.kid_left = anode;
-        current_expr.setNextNode((andNode));
-        current_expr = andNode;
+        ValNode bNode = bValNodes.pop();
+        AndNode andNode = new AndNode();
+        on_two_op(andNode, bNode);
     }
 
     void on_bracket_open() {
@@ -172,7 +196,7 @@ public class ParserFake {
             stmState = StatementState.CONDITION;
             BracketNode brNode = new BracketNode(current_snode);
             ((IfNode)current_snode).condition = brNode;
-            current_expr = brNode;
+            new_expr_env(brNode);
         } else if (stmState == StatementState.WHILE_START) {
             // TODO
         } else {
@@ -180,13 +204,14 @@ public class ParserFake {
                 past_stmStates.push(stmState);
                 stmState = StatementState.CONDITION;
             }
-            if (current_expr instanceof NotNode) {
-                BracketNode brNode = new BracketNode(current_expr);
-                ((NotNode) current_expr).kid = brNode;
-                current_expr = brNode;
+            Expr root = root_exprs.peek();
+            if (root instanceof NotNode) {
+                BracketNode brNode = new BracketNode(root);
+                ((NotNode) root).kid = brNode;
+                root_exprs.pop();
+                root_exprs.push(brNode);
             } else {
-                past_exprs.push(current_expr);
-                current_expr = new BracketNode();
+                new_expr_env(new BracketNode());
             }
         }
     }
@@ -194,22 +219,31 @@ public class ParserFake {
     void on_bracket_close() {
         if (stmState == StatementState.CONDITION) {
             stmState = past_stmStates.pop();
-            ValNode valNode = valNodes.pop();
+            ValNode valNode = aValNodes.pop();
             if (stmState == StatementState.IF_START) {
                 stmState = StatementState.IF_T;
-                ((BracketNode)((IfNode)current_snode).condition).kid = valNode;
+                //((BracketNode)((IfNode)current_snode).condition).kid = valNode;
+                Expr expr = get_last_expr();
+                expr.setNextNode(valNode);
+                clear_expr_env();
+                return;
             } else if (stmState == StatementState.WHILE_START) {
                 // TODO;
+                clear_expr_env();
+                return;
             }
         }
         // assert(current_expr instaceof BracketNode && current_expr.isFullRecv())
-        if (current_expr.getParent() instanceof NotNode) {
-            valNodes.push((ValNode) current_expr.getParent());
+        Expr expr = get_last_expr();
+        Node expr_parent = expr.getParent();
+        if (expr_parent != null && expr_parent instanceof NotNode) {
+            aValNodes.push((ValNode) expr.getParent());
         } else {
-            valNodes.push((ValNode) current_expr);
+            aValNodes.push((ValNode) expr);
         }
-        if ( !(current_snode instanceof  IfNode) /*|| !(current_snode instanceof WhileNode)*/ || !past_exprs.empty())
-            current_expr = past_exprs.pop();
+        restore_expr_env();
+        //if ( !(current_snode instanceof  IfNode) /*|| !(current_snode instanceof WhileNode)*/ || !past_exprs.empty())
+        //   exprs.push(past_exprs.pop());
     }
 
     void on_block_open() {
@@ -282,46 +316,12 @@ public class ParserFake {
 
     void on_true() {
         BoolNode bNode = new BoolNode(true);
-        //on_bnode(bNode);
-        on_anode(bNode);
+        on_bnode(bNode);
     }
 
     void on_false() {
         BoolNode bNode = new BoolNode(false);
-        //on_bnode(bNode);
-        on_anode(bNode);
-    }
-
-    void on_div() {
-        ValNode anode = valNodes.pop();
-        DivNode dNode = new DivNode();
-        if (anode instanceof PlusNode) {
-            dNode.kid_left = ((PlusNode) anode).kid_right;
-            ((PlusNode) anode).kid_right = dNode;
-            anode.setParent(current_expr);
-            dNode.setParent(anode);
-            current_expr.setNextNode(anode);
-            current_expr = dNode;
-        } else {
-            dNode.kid_left = anode;
-            dNode.setParent(current_expr);
-            anode.setParent(dNode);
-            current_expr.setNextNode(dNode);
-            current_expr = dNode;
-        }
-    }
-
-    void on_end_cmd(String str) {
-        if (state == State.ATRIBUTION) {
-            ValNode anode = valNodes.pop();
-            current_expr.setNextNode(anode);
-            anode.setParent(current_expr);
-            SNode new_seq = new SequenceNode(current_snode);
-            current_snode.setNextSNode(new_seq);
-            current_snode = new_seq;
-
-        }
-        state = State.NO_STATE;
+        on_bnode(bNode);
     }
 
     void finish() {

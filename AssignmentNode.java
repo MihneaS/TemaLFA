@@ -1,4 +1,4 @@
-public class AssignmentNode implements SNode, Expr{
+public class AssignmentNode implements SNode, Expr, OneOperand{
 
     Node parent;
     VariableNode var;
@@ -55,12 +55,12 @@ public class AssignmentNode implements SNode, Expr{
     }
 
     @Override
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public ValNode getValNode() {
+        return val;
     }
 
     @Override
-    public int getPriority() {
-        return priority;
+    public void setValNode(ValNode node) {
+        val = node;
     }
 }

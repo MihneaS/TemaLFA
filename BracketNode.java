@@ -21,16 +21,6 @@ public class BracketNode implements ValNode, Expr, OneOperand{
     }
 
     @Override
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    @Override
-    public int getPriority() {
-        return priority;
-    }
-
-    @Override
     public Node getParent() {
         return parent;
     }

@@ -3,10 +3,14 @@ public class GreaterNode implements ValNode, Expr, TwoOperands {
     Node parent;
     ValNode kid_left;
     ValNode kid_right;
-    int priority;
+    int priority = 6;
 
     GreaterNode(Node parent) {
         this.parent = parent;
+    }
+
+    public GreaterNode() {
+
     }
 
     @Override
