@@ -1,8 +1,9 @@
-public class PlusNode implements ValNode, Expr{
+public class PlusNode implements ValNode, Expr, TwoOperands {
 
     Node parent;
     ValNode kid_left;
     ValNode kid_right;
+    int priority;
 
     PlusNode() {}
 
@@ -52,5 +53,35 @@ public class PlusNode implements ValNode, Expr{
         } else {
             return  kid_right;
         }
+    }
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+
+    @Override
+    public ValNode getLeftNode() {
+        return kid_left;
+    }
+
+    @Override
+    public void setLeftNode(ValNode node) {
+        kid_left = node;
+    }
+
+    @Override
+    public ValNode getRightNode() {
+        return kid_right;
+    }
+
+    @Override
+    public void setRightNode(ValNode node) {
+        kid_right = node;
     }
 }

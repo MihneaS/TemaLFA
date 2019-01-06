@@ -18,13 +18,12 @@ public class ParserFake {
     }
 
     TreeMap<String, Integer> var_to_value = new TreeMap<String, Integer>();
-    Stack<ValNode> valNodes = new Stack<ValNode>();
+    Stack<ValNode> avalNodes = new Stack<ValNode>();
     Stack<ValNode> bValNodes = new Stack<ValNode>();
     MainNode root;
     SNode current_snode;
-    Expr current_expr;
-    Stack<Expr> past_exprs = new Stack<Expr>();
-    Stack<Expr> past_bexprs = new Stack<Expr>();
+    Stack<Expr> aexprs = new Stack<Expr>();
+    Stack<Expr> bexprs = new Stack<Expr>();
     State state = State.INITIALIZATION;
     StatementState stmState = StatementState.NO_STATE;
     Stack<StatementState> past_stmStates = new Stack<StatementState>();

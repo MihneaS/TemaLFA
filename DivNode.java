@@ -1,8 +1,9 @@
-public class DivNode implements ValNode, Expr{
+public class DivNode implements ValNode, Expr, TwoOperands {
 
     Node parent;
     ValNode kid_left;
     ValNode kid_right;
+    int priority;
 
     DivNode() {}
 
@@ -38,6 +39,16 @@ public class DivNode implements ValNode, Expr{
     }
 
     @Override
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+
+    @Override
     public Node getParent() {
         return parent;
     }
@@ -56,5 +67,25 @@ public class DivNode implements ValNode, Expr{
         System.out.println("<DivNode> /");
         kid_left.print(tabs+1);
         kid_right.print(tabs+1);
+    }
+
+    @Override
+    public ValNode getLeftNode() {
+        return kid_left;
+    }
+
+    @Override
+    public void setLeftNode(ValNode node) {
+        kid_left = node;
+    }
+
+    @Override
+    public ValNode getRightNode() {
+        return kid_right;
+    }
+
+    @Override
+    public void setRightNode(ValNode node) {
+        kid_right = node;
     }
 }

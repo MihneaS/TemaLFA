@@ -1,7 +1,8 @@
-public class NotNode implements ValNode, Expr{
+public class NotNode implements ValNode, Expr, OneOperand{
 
     Node parent;
     ValNode kid;
+    int priority;
 
     public NotNode(Node parent) {
         this.parent = parent;
@@ -15,6 +16,16 @@ public class NotNode implements ValNode, Expr{
     @Override
     public ValNode getLastNode() {
         return kid;
+    }
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
     }
 
     @Override
@@ -44,5 +55,15 @@ public class NotNode implements ValNode, Expr{
         }
         System.out.println("<NotNode> !");
         kid.print(tabs+1);
+    }
+
+    @Override
+    public ValNode getValNode() {
+        return kid;
+    }
+
+    @Override
+    public void setValNode(ValNode node) {
+        kid = node;
     }
 }

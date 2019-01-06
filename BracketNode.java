@@ -1,7 +1,8 @@
-public class BracketNode implements ValNode, Expr{
+public class BracketNode implements ValNode, Expr, OneOperand{
 
     Node parent;
     ValNode kid;
+    int priority;
 
     public BracketNode() {}
 
@@ -17,6 +18,16 @@ public class BracketNode implements ValNode, Expr{
     @Override
     public ValNode getLastNode() {
         return kid;
+    }
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
     }
 
     @Override
@@ -42,5 +53,15 @@ public class BracketNode implements ValNode, Expr{
     @Override
     public int getVal() {
         return kid.getVal();
+    }
+
+    @Override
+    public ValNode getValNode() {
+        return kid;
+    }
+
+    @Override
+    public void setValNode(ValNode node) {
+        kid = node;
     }
 }

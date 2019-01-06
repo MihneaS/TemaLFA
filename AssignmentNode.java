@@ -3,6 +3,7 @@ public class AssignmentNode implements SNode, Expr{
     Node parent;
     VariableNode var;
     ValNode val;
+    int priority;
 
     AssignmentNode(Node parent, VariableNode var){
         this.parent = parent;
@@ -51,5 +52,15 @@ public class AssignmentNode implements SNode, Expr{
     @Override
     public ValNode getLastNode() {
         return val;
+    }
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
     }
 }
