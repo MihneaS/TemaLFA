@@ -19,7 +19,7 @@ import java.util.HashMap;
     }
 
     enum StatementState {
-        NO_STATE, IF_START, IF_C, IF_T, IF_O, WHILE_START, WHILE_C, WHILE_B, CONDITION
+        NO_STATE, IF_START, IF_T, IF_O, WHILE_START, WHILE_B, CONDITION
     }
 
     HashMap<String, Integer> var_to_value = new HashMap<String, Integer>();
@@ -144,6 +144,14 @@ import java.util.HashMap;
         stmState = StatementState.IF_START;
     }
 
+    void on_while() {
+        WhileNode whNode = new WhileNode(current_snode);
+        current_snode.setNextSNode(whNode);
+        current_snode = whNode;
+        past_stmStates.push(stmState);
+        stmState = StatementState.WHILE_START;
+    }
+
     void on_two_op(TwoOperands op, ValNode lastVal) {
         Expr expr = get_last_expr();
         op.setParent(expr);
@@ -203,7 +211,11 @@ import java.util.HashMap;
             ((IfNode)current_snode).condition = brNode;
             new_expr_env(brNode);
         } else if (stmState == StatementState.WHILE_START) {
-            // TODO
+            past_stmStates.push(stmState);
+            stmState = StatementState.CONDITION;
+            BracketNode brNode = new BracketNode(current_snode);
+            ((WhileNode)current_snode).condition = brNode;
+            new_expr_env(brNode);
         } else {
             if (stmState == StatementState.CONDITION) {
                 past_stmStates.push(stmState);
@@ -233,7 +245,9 @@ import java.util.HashMap;
                 clear_expr_env();
                 return;
             } else if (stmState == StatementState.WHILE_START) {
-                // TODO;
+                stmState = StatementState.WHILE_B;
+                Expr expr = get_last_expr();
+                expr.setNextNode(valNode);
                 clear_expr_env();
                 return;
             }
@@ -248,27 +262,26 @@ import java.util.HashMap;
         }
         restore_expr_env();
         //if ( !(current_snode instanceof  IfNode) /*|| !(current_snode instanceof WhileNode)*/ || !past_exprs.empty())
-         //   exprs.push(past_exprs.pop());
+        //   exprs.push(past_exprs.pop());
     }
 
     void on_block_open() {
+        BlockNode blNode = null;
         if (stmState == StatementState.IF_T) {
-            BlockNode blNode = new BlockNode(current_snode);
+            blNode = new BlockNode(current_snode);
             ((IfNode) current_snode).then = blNode;
-            SequenceNode sqNode = new SequenceNode(blNode);
-            blNode.setNextSNode(sqNode);
-            current_snode = sqNode;
-            past_stmStates.push(stmState);
-            stmState = StatementState.NO_STATE;
         } else if (stmState == StatementState.IF_O) {
-            BlockNode blNode = new BlockNode(current_snode);
+            blNode = new BlockNode(current_snode);
             ((IfNode) current_snode).otherwise = blNode;
-            SequenceNode sqNode = new SequenceNode(blNode);
-            blNode.setNextSNode(sqNode);
-            current_snode = sqNode;
-            past_stmStates.push(stmState);
-            stmState = StatementState.NO_STATE;
+        } else if (stmState == StatementState.WHILE_B) {
+            blNode = new BlockNode(current_snode);
+            ((WhileNode) current_snode).body = blNode;
         }
+        SequenceNode sqNode = new SequenceNode(blNode);
+        blNode.setNextSNode(sqNode);
+        current_snode = sqNode;
+        past_stmStates.push(stmState);
+        stmState = StatementState.NO_STATE;
     }
 
     void on_block_close() { //TODO if in if si while in while si combinate
@@ -311,6 +324,30 @@ import java.util.HashMap;
             }
             IfNode ifNode = (IfNode) snode_gparent;
             current_snode = (SNode) ifNode.getParent();
+            if (current_snode instanceof SequenceNode) {   // todo wut?
+                SNode new_seq = new SequenceNode(current_snode);
+                current_snode.setNextSNode(new_seq);
+                current_snode = new_seq;
+            }
+        } else if (stmState == StatementState.WHILE_B) {
+            // assert(current_snode instanceof SequenceNode);
+            Node snode_parent = current_snode.getParent();
+            Node snode_gparent = snode_parent.getParent();
+            if (snode_gparent instanceof WhileNode) {
+                ((BlockNode)((WhileNode) snode_gparent).body).kid = null;
+            } else {
+                if (snode_gparent instanceof BlockNode) {
+                    ((BlockNode) snode_gparent).kid = ((SequenceNode) snode_parent).kid_left;
+                } else { //assert(snode_gparent instanceof SequenceNode)
+                    ((SequenceNode)snode_gparent).kid_right = ((SequenceNode) snode_parent).kid_left;
+                }
+            }
+            stmState = past_stmStates.pop();
+            while(!(snode_gparent instanceof WhileNode)) {
+                snode_gparent = snode_gparent.getParent();
+            }
+            WhileNode whNode = (WhileNode) snode_gparent;
+            current_snode = (SNode) whNode.getParent();
             if (current_snode instanceof SequenceNode) {   // todo wut?
                 SNode new_seq = new SequenceNode(current_snode);
                 current_snode.setNextSNode(new_seq);

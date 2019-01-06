@@ -261,31 +261,22 @@ public class ParserFake {
     }
 
     void on_block_open() {
+        BlockNode blNode = null;
         if (stmState == StatementState.IF_T) {
-            BlockNode blNode = new BlockNode(current_snode);
+            blNode = new BlockNode(current_snode);
             ((IfNode) current_snode).then = blNode;
-            SequenceNode sqNode = new SequenceNode(blNode);
-            blNode.setNextSNode(sqNode);
-            current_snode = sqNode;
-            past_stmStates.push(stmState);
-            stmState = StatementState.NO_STATE;
         } else if (stmState == StatementState.IF_O) {
-            BlockNode blNode = new BlockNode(current_snode);
+            blNode = new BlockNode(current_snode);
             ((IfNode) current_snode).otherwise = blNode;
-            SequenceNode sqNode = new SequenceNode(blNode);
-            blNode.setNextSNode(sqNode);
-            current_snode = sqNode;
-            past_stmStates.push(stmState);
-            stmState = StatementState.NO_STATE;
         } else if (stmState == StatementState.WHILE_B) {
-            BlockNode blNode = new BlockNode(current_snode);
+            blNode = new BlockNode(current_snode);
             ((WhileNode) current_snode).body = blNode;
-            SequenceNode sqNode = new SequenceNode(blNode);
-            blNode.setNextSNode(sqNode);
-            current_snode = sqNode;
-            past_stmStates.push(stmState);
-            stmState = StatementState.NO_STATE;
         }
+        SequenceNode sqNode = new SequenceNode(blNode);
+        blNode.setNextSNode(sqNode);
+        current_snode = sqNode;
+        past_stmStates.push(stmState);
+        stmState = StatementState.NO_STATE;
     }
 
     void on_block_close() { //TODO if in if si while in while si combinate
@@ -328,6 +319,30 @@ public class ParserFake {
             }
             IfNode ifNode = (IfNode) snode_gparent;
             current_snode = (SNode) ifNode.getParent();
+            if (current_snode instanceof SequenceNode) {   // todo wut?
+                SNode new_seq = new SequenceNode(current_snode);
+                current_snode.setNextSNode(new_seq);
+                current_snode = new_seq;
+            }
+        } else if (stmState == StatementState.WHILE_B) {
+            // assert(current_snode instanceof SequenceNode);
+            Node snode_parent = current_snode.getParent();
+            Node snode_gparent = snode_parent.getParent();
+            if (snode_gparent instanceof WhileNode) {
+                ((BlockNode)((WhileNode) snode_gparent).body).kid = null;
+            } else {
+                if (snode_gparent instanceof BlockNode) {
+                    ((BlockNode) snode_gparent).kid = ((SequenceNode) snode_parent).kid_left;
+                } else { //assert(snode_gparent instanceof SequenceNode)
+                    ((SequenceNode)snode_gparent).kid_right = ((SequenceNode) snode_parent).kid_left;
+                }
+            }
+            stmState = past_stmStates.pop();
+            while(!(snode_gparent instanceof WhileNode)) {
+                snode_gparent = snode_gparent.getParent();
+            }
+            WhileNode whNode = (WhileNode) snode_gparent;
+            current_snode = (SNode) whNode.getParent();
             if (current_snode instanceof SequenceNode) {   // todo wut?
                 SNode new_seq = new SequenceNode(current_snode);
                 current_snode.setNextSNode(new_seq);
