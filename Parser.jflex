@@ -416,6 +416,11 @@ int {}
     on_if();
 }
 
+"while" {
+    System.out.println("found " + yytext());
+    on_while();
+}
+
 "else" {
 }
 

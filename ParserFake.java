@@ -14,7 +14,7 @@ public class ParserFake {
     }
 
     enum StatementState {
-        NO_STATE, IF_START, IF_C, IF_T, IF_O, WHILE_START, WHILE_C, WHILE_B, CONDITION
+        NO_STATE, IF_START, IF_T, IF_O, WHILE_START, WHILE_B, CONDITION
     }
 
     HashMap<String, Integer> var_to_value = new HashMap<String, Integer>();
@@ -139,6 +139,14 @@ public class ParserFake {
         stmState = StatementState.IF_START;
     }
 
+    void on_while() {
+        WhileNode whNode = new WhileNode(current_snode);
+        current_snode.setNextSNode(whNode);
+        current_snode = whNode;
+        past_stmStates.push(stmState);
+        stmState = StatementState.WHILE_START;
+    }
+
     void on_two_op(TwoOperands op, ValNode lastVal) {
         Expr expr = get_last_expr();
         op.setParent(expr);
@@ -198,7 +206,11 @@ public class ParserFake {
             ((IfNode)current_snode).condition = brNode;
             new_expr_env(brNode);
         } else if (stmState == StatementState.WHILE_START) {
-            // TODO
+            past_stmStates.push(stmState);
+            stmState = StatementState.CONDITION;
+            BracketNode brNode = new BracketNode(current_snode);
+            ((WhileNode)current_snode).condition = brNode;
+            new_expr_env(brNode);
         } else {
             if (stmState == StatementState.CONDITION) {
                 past_stmStates.push(stmState);
@@ -228,7 +240,9 @@ public class ParserFake {
                 clear_expr_env();
                 return;
             } else if (stmState == StatementState.WHILE_START) {
-                // TODO;
+                stmState = StatementState.WHILE_B;
+                Expr expr = get_last_expr();
+                expr.setNextNode(valNode);
                 clear_expr_env();
                 return;
             }
@@ -258,6 +272,14 @@ public class ParserFake {
         } else if (stmState == StatementState.IF_O) {
             BlockNode blNode = new BlockNode(current_snode);
             ((IfNode) current_snode).otherwise = blNode;
+            SequenceNode sqNode = new SequenceNode(blNode);
+            blNode.setNextSNode(sqNode);
+            current_snode = sqNode;
+            past_stmStates.push(stmState);
+            stmState = StatementState.NO_STATE;
+        } else if (stmState == StatementState.WHILE_B) {
+            BlockNode blNode = new BlockNode(current_snode);
+            ((WhileNode) current_snode).body = blNode;
             SequenceNode sqNode = new SequenceNode(blNode);
             blNode.setNextSNode(sqNode);
             current_snode = sqNode;
